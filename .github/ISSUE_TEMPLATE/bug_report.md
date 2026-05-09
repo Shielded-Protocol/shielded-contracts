@@ -1,36 +1,23 @@
 ---
-name: "\U0001F41B Bug Report"
-about: Report a bug in the shielded contracts
-title: "[BUG] "
-labels: bug
-assignees: ''
+name: Bug report
+labels: type:bug
 ---
 
-## Bug Description
+## Describe the bug
+[Clear description of what went wrong]
 
-<!-- A clear and concise description of the bug -->
+## To reproduce
+1. ...
+2. ...
+3. ...
 
-## Steps to Reproduce
+## Expected behavior
+[What should happen]
 
-1. Step 1
-2. Step 2
-3. Step 3
-
-## Expected Behavior
-
-<!-- What you expected to happen -->
-
-## Actual Behavior
-
-<!-- What actually happened -->
+## Actual behavior
+[What happens instead]
 
 ## Environment
-
-- **Stellar CLI version:** `stellar --version`
-- **Rust version:** `rustc --version`
-- **OS:** 
-- **Network:** testnet / mainnet / local
-
-## Additional Context
-
-<!-- Add any other context, logs, or screenshots -->
+- OS: 
+- Node / Rust version:
+- Network: testnet / mainnet

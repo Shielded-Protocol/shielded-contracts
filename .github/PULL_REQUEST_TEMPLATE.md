@@ -1,32 +1,19 @@
-## Summary
+## What this does
+[One paragraph. What changed and why.]
 
-<!-- Brief description of the changes -->
-
-## Related Issues
-
-<!-- Link to related issues: Closes #XX, Fixes #YY -->
-
-## Type of Change
-
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to change)
-- [ ] Security fix
-- [ ] Documentation update
+## Type
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Refactor
+- [ ] Documentation
+- [ ] Tests
 
 ## Checklist
+- [ ] Tests pass locally
+- [ ] Docs updated (if behavior changed)
+- [ ] Tested on Stellar testnet (if contracts changed)
+- [ ] No new lint/clippy warnings
+- [ ] Issue linked
 
-- [ ] My code follows the project's style guidelines
-- [ ] I have run `cargo fmt` and `cargo clippy`
-- [ ] I have added tests that prove my fix/feature works
-- [ ] All new and existing tests pass (`cargo test --all`)
-- [ ] I have updated documentation as needed
-- [ ] I have reviewed the security implications of this change
-
-## Security Considerations
-
-<!-- Describe any security implications of this change -->
-
-## Testing
-
-<!-- Describe the tests you ran and their results -->
+## Notes for reviewer
+[Optional context]

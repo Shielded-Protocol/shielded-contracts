@@ -1,41 +1,41 @@
-# Contributing to Shielded Contracts
+# Contributing to shielded-contracts
 
-Thank you for your interest in contributing to Shielded Protocol!
+Welcome! We're thrilled that you want to contribute to the Shielded Protocol. Whether you're a ZK expert, a Rust developer, or just getting started with Soroban, there's a place for you here.
 
-## Development Setup
+## Contributor Tracks
 
-1. Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-2. Add WASM target: `rustup target add wasm32-unknown-unknown`
-3. Install Stellar CLI: `cargo install --locked stellar-cli --features opt`
-4. Clone the repo and run tests: `cargo test --all`
+### 1. ZK & Smart Contracts (Rust)
+- Setup: `rustup target add wasm32-unknown-unknown`
+- Test: `cargo test --all`
+- Good issues: Look for `layer:contracts` or `layer:circuits` labels.
 
-## Code Style
+### 2. SDK & Frontend (TypeScript)
+- Head over to `shielded-sdk` or `shielded-app` repos.
+- Good issues: Look for `layer:sdk` or `layer:app`.
 
-- Run `cargo fmt` before committing
-- Ensure `cargo clippy --all-targets -- -D warnings` passes
-- Write doc comments for all public items
-- Add tests for all new functionality
+### 3. Documentation
+- Head over to `shielded-docs`.
+- Good issues: Look for `layer:docs`.
 
-## Pull Request Process
+## Your First PR
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Make your changes with tests
-4. Ensure CI passes locally
-5. Submit a PR using the template
+1. Fork the repo.
+2. Create a branch: `git checkout -b feat/my-change`.
+3. Make your changes and add tests.
+4. Run `cargo fmt` and `cargo clippy`.
+5. Submit a PR!
 
-## Commit Messages
+## PR Checklist
 
-Use [Conventional Commits](https://www.conventionalcommits.org/):
+- [ ] Tests pass locally
+- [ ] Docs updated (if behavior changed)
+- [ ] No new lint/clippy warnings
+- [ ] Issue linked
 
-- `feat:` — new feature
-- `fix:` — bug fix
-- `docs:` — documentation changes
-- `test:` — adding or updating tests
-- `refactor:` — code refactoring
-- `chore:` — maintenance tasks
+## Code of Conduct
 
-## Security
+We follow the Contributor Covenant. Be kind and professional.
 
-If you discover a security vulnerability, please follow our [Security Policy](./SECURITY.md).
-Do NOT open a public issue for security vulnerabilities.
+## Wave Contributors
+
+Check out [Wave-ready issues](../../issues?q=label%3Astatus%3Awave-ready) to earn points!
