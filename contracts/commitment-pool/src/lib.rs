@@ -25,7 +25,22 @@ pub struct CommitmentPool;
 
 #[contractimpl]
 impl CommitmentPool {
-    /// Initialize the commitment pool with admin, token, and verifier contract addresses.
+    /// Initializes the commitment pool with admin, token, and verifier contract addresses.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `admin` - The address of the contract administrator.
+    /// * `token_id` - The address of the underlying token contract.
+    /// * `verifier_id` - The address of the Groth16 verifier contract.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` on successful initialization.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Error::Unauthorized` if the contract is already initialized.
     pub fn initialize(
         env: Env,
         admin: Address,
@@ -43,10 +58,25 @@ impl CommitmentPool {
         Ok(())
     }
 
-    /// Deposit a commitment into the shielded pool.
+    /// Deposits a commitment into the shielded pool.
     ///
     /// The commitment is a hash of (secret, nullifier, amount, token).
-    /// The encrypted_note allows the recipient to decrypt the note details.
+    /// The encrypted_note allows the recipient to decrypt the note details off-chain.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `commitment` - A 32-byte hash representing the user's deposit commitment.
+    /// * `encrypted_note` - The encrypted details of the deposit for the recipient.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` on a successful deposit.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `Error::ContractPaused` if the contract is currently paused.
+    /// * Returns `Error::DuplicateCommitment` if the commitment already exists in the tree.
     pub fn deposit(
         env: Env,
         commitment: BytesN<32>,
@@ -71,10 +101,28 @@ impl CommitmentPool {
         Ok(())
     }
 
-    /// Withdraw from the pool by providing a valid ZK proof.
+    /// Withdraws tokens from the pool by providing a valid ZK proof.
     ///
     /// The proof demonstrates knowledge of a valid commitment in the Merkle tree
     /// without revealing which commitment is being spent.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `nullifier` - A unique 32-byte hash derived from the secret to prevent double-spending.
+    /// * `proof` - The serialized ZK proof proving ownership of a commitment.
+    /// * `recipient` - The address that will receive the withdrawn tokens.
+    /// * `amount` - The amount of tokens to withdraw.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` on a successful withdrawal.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `Error::ContractPaused` if the contract is currently paused.
+    /// * Returns `Error::NullifierAlreadySpent` if the nullifier has been seen before.
+    /// * Returns `Error::InvalidProof` if the proof verification fails.
     pub fn withdraw(
         env: Env,
         nullifier: BytesN<32>,
@@ -131,16 +179,47 @@ impl CommitmentPool {
     }
 
     /// Returns the current Merkle root of the commitment tree.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    ///
+    /// # Returns
+    ///
+    /// Returns a 32-byte array representing the current Merkle root.
     pub fn get_root(env: Env) -> BytesN<32> {
         MerkleTree::root(&env)
     }
 
     /// Checks whether a nullifier has already been spent.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `nullifier` - The 32-byte nullifier hash to check.
+    ///
+    /// # Returns
+    ///
+    /// Returns `true` if the nullifier has been spent, otherwise `false`.
     pub fn is_nullifier_spent(env: Env, nullifier: BytesN<32>) -> bool {
         NullifierSet::is_spent(&env, &nullifier)
     }
 
-    /// Pause the contract. Only the admin can call this.
+    /// Pauses the contract, suspending deposits and withdrawals.
+    ///
+    /// Only the contract administrator can call this function.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successfully pausing the contract.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Error::Unauthorized` if the caller is not the admin.
     pub fn pause(env: Env) -> Result<(), Error> {
         let admin: Address = env.storage().instance()
             .get(&DataKey::Admin).ok_or(Error::Unauthorized)?;
@@ -150,7 +229,21 @@ impl CommitmentPool {
         Ok(())
     }
 
-    /// Unpause the contract. Only the admin can call this.
+    /// Unpauses the contract, resuming deposits and withdrawals.
+    ///
+    /// Only the contract administrator can call this function.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successfully unpausing the contract.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Error::Unauthorized` if the caller is not the admin.
     pub fn unpause(env: Env) -> Result<(), Error> {
         let admin: Address = env.storage().instance()
             .get(&DataKey::Admin).ok_or(Error::Unauthorized)?;
