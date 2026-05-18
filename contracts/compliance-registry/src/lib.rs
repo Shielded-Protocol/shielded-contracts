@@ -22,7 +22,20 @@ pub struct ComplianceRegistry;
 
 #[contractimpl]
 impl ComplianceRegistry {
-    /// Initialize the registry with an admin address.
+    /// Initializes the registry with an admin address.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `admin` - The address of the contract administrator.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` on successful initialization.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ComplianceError::Unauthorized` if the contract is already initialized.
     pub fn initialize(env: Env, admin: Address) -> Result<(), ComplianceError> {
         if env.storage().instance().has(&RegistryKey::Admin) {
             return Err(ComplianceError::Unauthorized);
@@ -32,7 +45,20 @@ impl ComplianceRegistry {
         Ok(())
     }
 
-    /// Set the auditor address. Only admin can call this.
+    /// Sets the auditor address. Only the admin can call this function.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `auditor` - The address of the designated auditor.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successful update of the auditor address.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ComplianceError::Unauthorized` if the caller is not the admin.
     pub fn set_auditor(env: Env, auditor: Address) -> Result<(), ComplianceError> {
         let admin: Address = env.storage().instance()
             .get(&RegistryKey::Admin).ok_or(ComplianceError::Unauthorized)?;
@@ -41,10 +67,24 @@ impl ComplianceRegistry {
         Ok(())
     }
 
-    /// Register an encrypted viewing key for a commitment.
+    /// Registers an encrypted viewing key for a commitment.
     ///
     /// The viewing key is encrypted with the auditor's public key,
     /// allowing only the auditor to decrypt transaction details.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `commitment` - The 32-byte hash of the commitment.
+    /// * `encrypted_key` - The encrypted viewing key.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successful registration.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ComplianceError::AlreadyRegistered` if a key is already registered for this commitment.
     pub fn register_viewing_key(
         env: Env,
         commitment: BytesN<32>,
@@ -58,8 +98,23 @@ impl ComplianceRegistry {
         Ok(())
     }
 
-    /// Get the encrypted viewing key for a commitment.
+    /// Gets the encrypted viewing key for a commitment.
+    /// 
     /// Only the auditor can retrieve viewing keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `commitment` - The 32-byte hash of the commitment.
+    ///
+    /// # Returns
+    ///
+    /// Returns the encrypted viewing key as `Bytes`.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `ComplianceError::NotAuditor` if the caller is not the registered auditor.
+    /// * Returns `ComplianceError::NotFound` if no viewing key exists for the given commitment.
     pub fn get_viewing_key(
         env: Env,
         commitment: BytesN<32>,

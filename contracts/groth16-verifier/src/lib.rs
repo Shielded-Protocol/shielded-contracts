@@ -50,7 +50,20 @@ pub struct Groth16Verifier;
 
 #[contractimpl]
 impl Groth16Verifier {
-    /// Initialize the verifier with an admin address.
+    /// Initializes the verifier with an admin address.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `admin` - The address of the contract administrator.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` on successful initialization.
+    ///
+    /// # Errors
+    ///
+    /// Returns `VerifierError::Unauthorized` if the contract is already initialized.
     pub fn initialize(env: Env, admin: Address) -> Result<(), VerifierError> {
         if env.storage().instance().has(&VkKey::Admin) {
             return Err(VerifierError::Unauthorized);
@@ -60,9 +73,23 @@ impl Groth16Verifier {
         Ok(())
     }
 
-    /// Register a verification key by storing its serialized form.
+    /// Registers a verification key by storing its serialized form.
     ///
     /// Only the admin can register verification keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `vk_hash` - The 32-byte hash of the verification key.
+    /// * `vk_data` - The serialized verification key data.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successful registration.
+    ///
+    /// # Errors
+    ///
+    /// Returns `VerifierError::Unauthorized` if the caller is not the admin.
     pub fn register_vk(
         env: Env,
         vk_hash: BytesN<32>,
@@ -81,22 +108,40 @@ impl Groth16Verifier {
         Ok(())
     }
 
-    /// Check if a verification key is registered.
+    /// Checks if a verification key is registered.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `vk_hash` - The 32-byte hash of the verification key to check.
+    ///
+    /// # Returns
+    ///
+    /// Returns `true` if the verification key is registered, otherwise `false`.
     pub fn is_vk_registered(env: Env, vk_hash: BytesN<32>) -> bool {
         env.storage()
             .persistent()
             .has(&VkKey::Vk(vk_hash))
     }
 
-    /// Verify a Groth16 proof against registered verification key.
+    /// Verifies a Groth16 proof against a registered verification key.
     ///
     /// # Arguments
-    /// * `proof` - Serialized proof bytes (A, B, C points)
-    /// * `public_inputs` - Vector of 32-byte public input scalars
-    /// * `vk_hash` - Hash of the verification key to use
+    ///
+    /// * `env` - The execution environment.
+    /// * `proof` - Serialized proof bytes (A, B, C points).
+    /// * `public_inputs` - Vector of 32-byte public input scalars.
+    /// * `vk_hash` - Hash of the verification key to use.
     ///
     /// # Returns
-    /// `true` if the proof is valid, `false` otherwise
+    ///
+    /// Returns `Ok(true)` if the proof is valid, `Ok(false)` if invalid.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `VerifierError::VkNotRegistered` if the given `vk_hash` is not found.
+    /// * Returns `VerifierError::InvalidProofFormat` if the proof length is incorrect.
+    /// * Returns `VerifierError::InvalidPublicInputs` if the public inputs vector is empty.
     pub fn verify(
         env: Env,
         proof: Bytes,

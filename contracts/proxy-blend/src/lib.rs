@@ -24,7 +24,22 @@ pub struct ProxyBlend;
 
 #[contractimpl]
 impl ProxyBlend {
-    /// Initialize the proxy with admin and pool addresses.
+    /// Initializes the proxy with admin and pool addresses.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `admin` - The address of the contract administrator.
+    /// * `commitment_pool_id` - The address of the shielded commitment pool.
+    /// * `blend_pool_id` - The address of the Blend lending pool.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` on successful initialization.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ProxyBlendError::Unauthorized` if the contract is already initialized.
     pub fn initialize(
         env: Env,
         admin: Address,
@@ -42,10 +57,25 @@ impl ProxyBlend {
         Ok(())
     }
 
-    /// Deposit into Blend lending pool using a shielded withdrawal proof.
+    /// Deposits into the Blend lending pool using a shielded withdrawal proof.
     ///
     /// Flow: User proves ownership of shielded funds → proxy withdraws
     /// from commitment pool → deposits into Blend pool.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `nullifier` - The nullifier corresponding to the shielded commitment being spent.
+    /// * `proof` - The ZK proof proving ownership of the commitment.
+    /// * `amount` - The amount of tokens to deposit.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successful deposit.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ProxyBlendError::ContractPaused` if the proxy contract is paused.
     pub fn shielded_deposit(
         env: Env,
         nullifier: BytesN<32>,
@@ -61,10 +91,24 @@ impl ProxyBlend {
         Ok(())
     }
 
-    /// Withdraw from Blend lending pool into a new shielded commitment.
+    /// Withdraws from the Blend lending pool into a new shielded commitment.
     ///
     /// Flow: Proxy withdraws from Blend → creates new commitment
     /// in the shielded pool.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `commitment` - The 32-byte hash of the new commitment to create.
+    /// * `amount` - The amount of tokens to withdraw.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successful withdrawal.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ProxyBlendError::ContractPaused` if the proxy contract is paused.
     pub fn shielded_withdraw(
         env: Env,
         commitment: BytesN<32>,
@@ -79,7 +123,23 @@ impl ProxyBlend {
         Ok(())
     }
 
-    /// Borrow from Blend lending pool using shielded collateral.
+    /// Borrows from the Blend lending pool using shielded collateral.
+    ///
+    /// # Arguments
+    ///
+    /// * `env` - The execution environment.
+    /// * `collateral_nullifier` - The nullifier corresponding to the collateral commitment.
+    /// * `collateral_proof` - The ZK proof proving ownership of the collateral.
+    /// * `borrow_amount` - The amount of tokens to borrow.
+    /// * `borrow_commitment` - The new commitment hash for the borrowed funds.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` upon successful borrow operation.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ProxyBlendError::ContractPaused` if the proxy contract is paused.
     pub fn shielded_borrow(
         env: Env,
         collateral_nullifier: BytesN<32>,
