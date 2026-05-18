@@ -253,6 +253,11 @@ impl CommitmentPool {
         Ok(())
     }
 
+    /// Check if the contract is currently paused.
+    pub fn is_paused(env: Env) -> bool {
+        env.storage().instance().get(&DataKey::Paused).unwrap_or(false)
+    }
+
     fn require_not_paused(env: &Env) -> Result<(), Error> {
         let paused: bool = env.storage().instance()
             .get(&DataKey::Paused).unwrap_or(false);
@@ -329,5 +334,72 @@ mod test {
 
         let nullifier = BytesN::from_array(&env, &[2u8; 32]);
         assert!(!client.is_nullifier_spent(&nullifier));
+    }
+
+    #[test]
+    fn test_pause_unpause() {
+        let env = Env::default();
+        let contract_id = env.register(CommitmentPool, ());
+        let client = CommitmentPoolClient::new(&env, &contract_id);
+
+        let admin = Address::generate(&env);
+        let token = Address::generate(&env);
+        let verifier = Address::generate(&env);
+
+        env.mock_all_auths();
+        client.initialize(&admin, &token, &verifier);
+
+        assert!(!client.is_paused());
+
+        client.pause();
+        assert!(client.is_paused());
+
+        client.unpause();
+        assert!(!client.is_paused());
+    }
+
+    #[test]
+    #[should_panic(expected = "Error(Contract, #6)")]
+    fn test_deposit_when_paused() {
+        let env = Env::default();
+        let contract_id = env.register(CommitmentPool, ());
+        let client = CommitmentPoolClient::new(&env, &contract_id);
+
+        let admin = Address::generate(&env);
+        let token = Address::generate(&env);
+        let verifier = Address::generate(&env);
+
+        env.mock_all_auths();
+        client.initialize(&admin, &token, &verifier);
+
+        client.pause();
+
+        let commitment = BytesN::from_array(&env, &[1u8; 32]);
+        let note = Bytes::from_slice(&env, &[0u8; 64]);
+
+        client.deposit(&commitment, &note);
+    }
+
+    #[test]
+    #[should_panic(expected = "Error(Contract, #6)")]
+    fn test_withdraw_when_paused() {
+        let env = Env::default();
+        let contract_id = env.register(CommitmentPool, ());
+        let client = CommitmentPoolClient::new(&env, &contract_id);
+
+        let admin = Address::generate(&env);
+        let token = Address::generate(&env);
+        let verifier = Address::generate(&env);
+
+        env.mock_all_auths();
+        client.initialize(&admin, &token, &verifier);
+
+        client.pause();
+
+        let nullifier = BytesN::from_array(&env, &[2u8; 32]);
+        let proof = Bytes::from_slice(&env, &[0u8; 64]);
+        let recipient = Address::generate(&env);
+
+        client.withdraw(&nullifier, &proof, &recipient, &100i128);
     }
 }
